@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/imagetopdf/static/css/main.b79dc0d1.css",
+    "main.js": "/imagetopdf/static/js/main.f5de0a11.js",
+    "static/js/787.cda612ba.chunk.js": "/imagetopdf/static/js/787.cda612ba.chunk.js",
+    "index.html": "/imagetopdf/index.html",
+    "main.b79dc0d1.css.map": "/imagetopdf/static/css/main.b79dc0d1.css.map",
+    "main.f5de0a11.js.map": "/imagetopdf/static/js/main.f5de0a11.js.map",
+    "787.cda612ba.chunk.js.map": "/imagetopdf/static/js/787.cda612ba.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b79dc0d1.css",
+    "static/js/main.f5de0a11.js"
+  ]
+}
