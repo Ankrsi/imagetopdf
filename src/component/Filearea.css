@@ -148,3 +148,7 @@
     filter: invert(1);
     cursor: pointer;
 }
+.download-btn progress{
+    width: 40%;
+    height: 5%;
+}

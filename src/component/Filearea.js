@@ -4,6 +4,9 @@ import fileareacss from './Filearea.css';
 function Filearea() {
     const [file, setFile] = useState([]);
     const [status,setStatus] = useState('');
+    const [convertBtnClick,setConvertBtnClick] = useState(false);
+    const [dataLen,setDataLen] = useState(0);
+    const [cdataLen,setCDataLen] = useState(0);
     const fieldref = useRef(null);
     const handleDrop = async (event) => {
         event.preventDefault();
@@ -18,18 +21,37 @@ function Filearea() {
         setFile([...temp]);
     }
     const sendBackend = async()=>{
+        setConvertBtnClick(true);
         let tempForm = new FormData();
         file.forEach((value,index)=>tempForm.append('images',value));
         try{
-            let result = await fetch('https://imagetopdfbackendapi.onrender.com/api/imagetopdf',
+            //let result = await fetch('https://imagetopdfbackendapi.onrender.com/api/imagetopdf',
+            let result = await fetch('http://localhost:3000/api/imagetopdf',
                 {
                     method:'POST',
                     mode:'cors',
                     body:tempForm,
                 }
             );
-            result = await result.json();
-            setStatus(result);
+            //result = await result.json();
+            //setStatus(result);
+            let tempResult = '';
+            const reader = result.body.getReader();
+            const { value } = await reader.read();
+            const tempVal = new TextDecoder().decode(value);
+            const totelLenIdx = tempVal.match('<<>>').index;
+            setDataLen(+tempVal.slice(0,totelLenIdx));
+            tempResult += tempVal.slice(totelLenIdx+4,);
+            setCDataLen((tempResult.length/dataLen)*100);
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                  break;
+                }
+                tempResult += new TextDecoder().decode(value);
+                setCDataLen((tempResult.length/dataLen)*100);
+            }
+            setStatus({result:tempResult});
         }
         catch(error){
             console.warn(error);
@@ -73,25 +95,33 @@ function Filearea() {
                 }
                 {
                     (function(){
-                        if(status.result){
-                            const buf = status.result;
-                            return (
-                                <div className="download-btn">
-                                    <h2>You PDF Is Ready For Download</h2>
-                                    <a href={buf} download={'output.pdf'} onClick={()=>{setTimeout(()=>{setFile([]);setStatus('')},3000)}}>
-                                        <button type='button' className='download-btn-click'>
-                                            <img alt='' className='download-btn-icon'src={process.env.PUBLIC_URL+'/icon/download-icon.svg'}/>
-                                            Download
-                                        </button>
-                                    </a>
-                                    <div>
-                                        <img className='download-close' onClick={()=>{setStatus('')}}alt='' src={process.env.PUBLIC_URL+'/icon/close-icon.svg'}/>
+                        if(convertBtnClick){
+                            if(status.result){
+                                const buf = status.result;
+                                return (
+                                    <div className="download-btn">
+                                        <h2>You PDF Is Ready For Download</h2>
+                                        <a href={buf} download={'output.pdf'} onClick={()=>{setTimeout(()=>{setFile([]);setStatus('');setConvertBtnClick(false)},3000)}}>
+                                            <button type='button' className='download-btn-click'>
+                                                <img alt='' className='download-btn-icon'src={process.env.PUBLIC_URL+'/icon/download-icon.svg'}/>
+                                                Download
+                                            </button>
+                                        </a>
+                                        <div>
+                                            <img className='download-close' onClick={()=>{setStatus('');setConvertBtnClick(false)}}alt='' src={process.env.PUBLIC_URL+'/icon/close-icon.svg'}/>
+                                        </div>
                                     </div>
-                                </div>
-                            )
-                        }
-                        else{
-                            return <></>
+                                )
+                            }
+                            else{
+                                return (
+                                    <div className="download-btn">
+                                        <h2>PDF Uploaded &#8594; Converting To PDF </h2>
+                                        <progress id="file" value={cdataLen} max="100"/>
+                                        <img className='download-close' onClick={()=>{setStatus('');setConvertBtnClick(false)}}alt='' src={process.env.PUBLIC_URL+'/icon/close-icon.svg'}/>
+                                    </div>
+                                )
+                            }
                         }
                     })()
                 }
