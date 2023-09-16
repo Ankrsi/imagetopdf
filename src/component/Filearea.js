@@ -25,8 +25,7 @@ function Filearea() {
         let tempForm = new FormData();
         file.forEach((value,index)=>tempForm.append('images',value));
         try{
-            //let result = await fetch('https://imagetopdfbackendapi.onrender.com/api/imagetopdf',
-            let result = await fetch('http://localhost:3000/api/imagetopdf',
+            let result = await fetch('https://imagetopdfbackendapi.onrender.com/api/imagetopdf',
                 {
                     method:'POST',
                     mode:'cors',
